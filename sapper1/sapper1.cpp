@@ -4,17 +4,73 @@
 
 using namespace std;
 
+void clearConsole();
+
 void menu();
 
 void error(int& lim, int& min);
 
-void displayField(string pole2[][100], int lim)
+void win()
 {
-	for (int i = 0; i < lim; i++) {
-		for (int j = 0; j < lim; j++) {
-			cout << pole2[i][j] << "\t";
+	cout << "Поздравляю, ты выиграл! Скоро вас перебросит в меню" << endl;
+	system("pause");
+	menu();
+}
+
+void displayField(string pole2[][100], int lim, int onoff)
+{
+	if(onoff %2 == 0)
+	{
+		cout << "\t";
+		for (int i = 0; i < lim; i++)
+		{
+			cout << i + 1 << "\t";
 		}
 		cout << endl;
+
+		for (int i = 0; i < lim; i++)
+		{
+			cout << i + 1 << "\t";
+
+			for (int j = 0; j < lim; j++)
+			{
+				cout << pole2[i][j] << "\t";
+			}
+			cout << endl;
+		}
+	}
+	else
+	{
+		cout << "  ";
+		for (int i = 0; i < lim; i++)
+		{
+			if (i + 1 > 9)
+			{
+				cout << i + 1 << " ";
+			}
+			else
+			{
+				cout << i + 1 << "  ";
+			}
+		}
+		cout << endl;
+
+		for (int i = 0; i < lim; i++)
+		{
+			if (i + 1 > 9)
+			{
+				cout << i + 1;
+			}
+			else
+			{
+				cout << i + 1 << " ";
+			}
+			for (int j = 0; j < lim; j++)
+			{
+				cout << pole2[i][j]<<" ";
+			}
+			cout << endl;
+		}
 	}
 }
 
@@ -54,13 +110,42 @@ void back()
 	}
 }
 
+void open(int pole[][100], string pole2[][100], int lim, int row, int col)
+{
+	if (row < 0 || row >= lim || col < 0 || col >= lim || pole2[row][col] != "[]") {
+		return;
+	}
+
+	int mine = minn(pole, lim, row, col);
+	pole2[row][col] = to_string(mine) + " ";
+
+	if (mine == 0) 
+	{
+		for (int i = row - 1; i <= row + 1; i++) 
+		{
+			for (int j = col - 1; j <= col + 1; j++) 
+			{
+				if (i >= 0 && i < lim && j >= 0 && j < lim && !(i == row && j == col))
+				{
+					if (mine == 0) 
+					{
+						open(pole, pole2, lim, i, j);
+					}
+				}
+			}
+		}
+	}
+}
+
 void start(int pole[][100], int lim, int min)
 {
 	clearConsole();
 
+
 	bool game_end = 1;
 	bool error = 1;
 	bool error1 = 1;
+	int onoff = 2;
 	int col = 0;
 	int rov = 0;
 	int fl1 = 0;
@@ -75,14 +160,14 @@ void start(int pole[][100], int lim, int min)
 	int choise = 0;
 
 	cout << "|||||||||||||||||||||||||||||||||||Игра началась!|||||||||||||||||||||||||||||||||||" << endl;
-	for (int i = 0; i < lim; i++)
+	/*for (int i = 0; i < lim; i++)
 	{
 		for (int j = 0; j < lim; j++)
 		{
 			cout << pole[i][j] << "\t";
 		}
 		cout << endl;
-	}
+	}*/
 
 	for (int i = 0; i < lim; i++)
 	{
@@ -101,15 +186,15 @@ void start(int pole[][100], int lim, int min)
 		}
 		abc++;
 
-		displayField(pole2, lim);
+		displayField(pole2, lim,onoff);
 
-		cout << "1 - открыть ячейку\n" << "2 - поставить флажок" << endl;
+		cout << "1 - открыть ячейку\n" << "2 - поставить флажок"<<"\n"<< "3 - Изменить формат игрового поля (РЕКОМЕНДУЕТСЯ ДЛЯ ПОЛЯ 10Х10 И БОЛЬШЕ)" << endl;
 		cin >> choise;
-
-		if (choise == 1)
+		switch (choise)
 		{
+		case 1:
 			clearConsole();
-			displayField(pole2, lim);
+			displayField(pole2, lim, onoff);
 
 			cout << "Введите номер столбца: " << endl;
 			cin >> col;
@@ -138,10 +223,11 @@ void start(int pole[][100], int lim, int min)
 			}
 			else
 			{
-				int mine = minn(pole, lim, rov, col);
-				pole2[rov][col] = to_string(mine) + " ";
+		
+				open(pole, pole2, lim, rov, col);
+	
 			}
-			clearConsole();
+			//clearConsole();
 			if (pole2[rov][col] == "* " && life == 1)
 			{
 				cout << "Вы попали на мину! Игра окончена :(" << endl;
@@ -152,14 +238,16 @@ void start(int pole[][100], int lim, int min)
 			{
 				cout << "Вы попали на мину, но ничего страшного, т.к. это первый ход, просто наступите на поле, которое отмечено цифрой :)" << endl;
 				life = 1;
+				system("pause");
 			}
+
 			//clearConsole();
-			displayField(pole2, lim);
-		}
-		else if(choise == 2)
-		{
+			displayField(pole2, lim, onoff);
+			break;
+
+		case 2:
 			clearConsole();
-			displayField(pole2, lim);
+			displayField(pole2, lim, onoff);
 
 			cout << "Выберите место, куда вы хотите поставить флаг." << endl;
 			cout << "Введите номер столбца: " << endl;
@@ -181,9 +269,14 @@ void start(int pole[][100], int lim, int min)
 			//flag1 = 0;
 
 			clearConsole();
-			displayField(pole2, lim);
+			displayField(pole2, lim, onoff);
+			break;
+		case 3:
+			onoff++;
+			displayField(pole2, lim, onoff);
+			break;
 		}
-
+		
 		for (int i = 0; i < lim; i++)
 		{
 			for (int j = 0; j < lim; j++)
@@ -206,94 +299,32 @@ void start(int pole[][100], int lim, int min)
 			}
 		}
 
-
 		if (count == 0 && flag == min)
 		{
-			cout << "Поздравляю, ты выиграл! Скоро вас перебросит в меню" << endl;
-			system("pause");
-			menu();
-		}
-/*
-		displayField(pole2, lim);
-
-		cout << "Введите номер столбца: " << endl;
-		cin >> col;
-		cout << "Введите номер строки: " << endl;
-		cin >> rov;
-
-		while (col > lim || col <= 0)
-		{
-			cout << "Ошибка! Вы ввели неправильный номер столбца и вышли за границы игрового поля, попробуйте снова" << endl;
-			cin >> col;
-		}
-		while (rov > lim || rov <= 0)
-		{
-			cout << "Ошибка! Вы ввели неправильный номер строки и вышли за границы игрового поля, попробуйте снова" << endl;
-			cin >> rov;
+			win();
 		}
 
-		col = col - 1;
-		rov = rov - 1;
-
-		if (pole[rov][col] == 1)
-		{
-			pole2[rov][col] = "* ";
-			//cout << "Вы попали на мину! Игра окончена :(" << endl;
-			//game_end = false;
-		}
-		else
-
-		{
-			int mine = minn(pole, lim, rov, col);
-			pole2[rov][col] = to_string(mine) + " ";
-		}
-
-		clearConsole();
-		if (pole2[rov][col] == "* " && life == 1)
-		{
-			cout << "Вы попали на мину! Игра окончена :(" << endl;
-			game_end = false;
-		}
-
-		if (pole2[rov][col] == "* " && life == 2)
-		{
-			cout << "Вы попали на мину, но ничего страшного, т.к. это первый ход, просто наступите на поле, которое отмечено цифрой :)" << endl;
-			life = 1;
-		}
-		*/
-		//displayField(pole2, lim);
 		if (!game_end)
 		{
 			break;
 		}
-		//cout << "1 - поставить флаг, продолжить игру - любая другая клавиша" << endl;
-		//cin >> flag1;
 
-		/*if (flag1 == 1)
+		for (int i = 0; i < lim; i++)
 		{
-			cout << "Выберите место, куда вы хотите поставить флаг." << endl;
-			cout << "Введите номер столбца: " << endl;
-			cin >> fl1;
-			cout << "Введите номер строки: " << endl;
-			cin >> fl2;
-
-			while (fl1 > lim || fl1 <= 0 || fl2 > lim || fl2 <= 0) {
-				cout << "Ошибка! Вы ввели неправильные координаты и вышли за границы игрового поля, попробуйте снова" << endl;
-				cout << "Введите номер столбца: " << endl;
-				cin >> fl1;
-				cout << "Введите номер строки: " << endl;
-				cin >> fl2;
+			for (int j = 0; j < lim; j++)
+			{
+				if (pole2[i][j] == "[]")
+				{
+					life = 2;
+				}
+				else
+				{
+					life = 1;
+				}
 			}
+		}
 
-			fl1 = fl1 - 1;
-			fl2 = fl2 - 1;
-			pole2[fl2][fl1] = "ф ";
-			flag1 = 0;
-
-			clearConsole();
-			displayField(pole2, lim);
-		}*/
-		life = 1;
+		//life = 1;
 		count = 0;
 		flag = 0;
 	}
@@ -493,7 +524,7 @@ void menu()
 		instruction();
 		break;
 	case 3:
-		break;
+		return;
 	default:
 		cout << "Вы ошиблись при вводе! Попробуйте еще раз" << endl;
 		menu();
