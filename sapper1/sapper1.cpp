@@ -17,7 +17,34 @@ void win()
 	menu();
 }
 
-void displayField(string pole2[][100], int lim, int onoff)
+int flags(string pole2[][100], int lim, int min)
+{
+	int flags = 0;
+	int flag = 0;
+	for (int i = 0; i < lim; i++)
+	{
+		for (int j = 0; j < lim; j++)
+		{
+			if (pole2[i][j] == "ф " || pole2[i][j] == "* ")
+			{
+				flags++;
+			}
+		}
+
+	}
+	flags = min - flags;
+	if (flags == 11)
+	{
+		cout << "Осталось установить " << flags << " флаг? флага? флагов? мин? мина? минов?" << endl;
+	}
+	else
+	{
+		cout << "Осталось установить " << flags << " флагов" << endl;
+	}
+	return  0;
+}
+
+void displayField(string pole2[][100], int lim, int onoff, int min)
 {
 	if(onoff %2 == 0)
 	{
@@ -38,6 +65,7 @@ void displayField(string pole2[][100], int lim, int onoff)
 			}
 			cout << endl;
 		}
+		flags(pole2, lim, min);
 	}
 	else
 	{
@@ -71,6 +99,7 @@ void displayField(string pole2[][100], int lim, int onoff)
 			}
 			cout << endl;
 		}
+		flags(pole2, lim, min);
 	}
 }
 
@@ -141,10 +170,11 @@ void start(int pole[][100], int lim, int min)
 {
 	clearConsole();
 
-
+	
 	bool game_end = 1;
 	bool error = 1;
 	bool error1 = 1;
+	int flags = 0;
 	int onoff = 2;
 	int col = 0;
 	int rov = 0;
@@ -158,6 +188,7 @@ void start(int pole[][100], int lim, int min)
 	int count = 0;
 	int flag = 0;
 	int choise = 0;
+	int pod = 0;
 
 	cout << "|||||||||||||||||||||||||||||||||||Игра началась!|||||||||||||||||||||||||||||||||||" << endl;
 	/*for (int i = 0; i < lim; i++)
@@ -180,21 +211,23 @@ void start(int pole[][100], int lim, int min)
 	cout << "Если вы готовы начать, то можете выбирать клетку!" << "\n" << "!!!Напоминание!!!" << "\n" << "Введите 2 числа, первое число - это столец, второе число - строчка, удачи!" << endl;
 	while (game_end)
 	{
+		flags = min;
+
 		if (abc > 0)
 		{
 			clearConsole();
 		}
 		abc++;
 
-		displayField(pole2, lim,onoff);
+		displayField(pole2, lim,onoff, min);
 
-		cout << "1 - открыть ячейку\n" << "2 - поставить флажок"<<"\n"<< "3 - Изменить формат игрового поля (РЕКОМЕНДУЕТСЯ ДЛЯ ПОЛЯ 10Х10 И БОЛЬШЕ)" << endl;
+		cout << "\n1 - открыть ячейку\n" << "2 - поставить флажок"<<"\n"<< "3 - Изменить формат игрового поля (РЕКОМЕНДУЕТСЯ ДЛЯ ПОЛЯ 10Х10 И БОЛЬШЕ)"<< endl;
 		cin >> choise;
 		switch (choise)
 		{
 		case 1:
 			clearConsole();
-			displayField(pole2, lim, onoff);
+			displayField(pole2, lim, onoff, min);
 
 			cout << "Введите номер столбца: " << endl;
 			cin >> col;
@@ -230,6 +263,7 @@ void start(int pole[][100], int lim, int min)
 			//clearConsole();
 			if (pole2[rov][col] == "* " && life == 1)
 			{
+				clearConsole();
 				cout << "Вы попали на мину! Игра окончена :(" << endl;
 				game_end = false;
 			}
@@ -242,12 +276,12 @@ void start(int pole[][100], int lim, int min)
 			}
 
 			//clearConsole();
-			displayField(pole2, lim, onoff);
+			displayField(pole2, lim, onoff, min);
 			break;
 
 		case 2:
 			clearConsole();
-			displayField(pole2, lim, onoff);
+			displayField(pole2, lim, onoff, min);
 
 			cout << "Выберите место, куда вы хотите поставить флаг." << endl;
 			cout << "Введите номер столбца: " << endl;
@@ -269,11 +303,11 @@ void start(int pole[][100], int lim, int min)
 			//flag1 = 0;
 
 			clearConsole();
-			displayField(pole2, lim, onoff);
+			displayField(pole2, lim, onoff, min);
 			break;
 		case 3:
 			onoff++;
-			displayField(pole2, lim, onoff);
+			displayField(pole2, lim, onoff, min);
 			break;
 		}
 		
@@ -309,11 +343,17 @@ void start(int pole[][100], int lim, int min)
 			break;
 		}
 
+		//
+
 		for (int i = 0; i < lim; i++)
 		{
 			for (int j = 0; j < lim; j++)
 			{
 				if (pole2[i][j] == "[]")
+				{
+					pod++;
+				}
+				if (pod == lim*lim)
 				{
 					life = 2;
 				}
@@ -327,6 +367,7 @@ void start(int pole[][100], int lim, int min)
 		//life = 1;
 		count = 0;
 		flag = 0;
+		pod = 0;
 	}
 }
 
